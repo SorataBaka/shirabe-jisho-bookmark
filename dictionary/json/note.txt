@@ -1,0 +1,4 @@
+JMDict Json Source was retrieved from 
+https://github.com/scriptin/jmdict-simplified/releases
+
+though was deleted to the file size limit prohibiting the upload to github
