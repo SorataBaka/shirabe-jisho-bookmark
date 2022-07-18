@@ -1,12 +1,14 @@
 import styles from "../styles/Home.module.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export default function Home() {
 	const [kanjiList, setKanjiList] = useState([]);
 	const [bookmarkList, setBookmarkList] = useState([]);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [popupActive, setPopupActive] = useState(false);
-	const [filename, setFilename] = useState("");
+	// const [filename, setFilename] = useState("");
+	const [selectedIndex, setSelectedIndex] = useState(null);
+
 	const handleInputChange = (e) => {
 		setSearchQuery(e.target.value);
 	};
@@ -21,7 +23,7 @@ export default function Home() {
 		if (bookmarkList.filter((item) => item.id === newitem.id).length > 0) {
 			setBookmarkList(bookmarkList.filter((item) => item.id !== newitem.id));
 		} else {
-			setBookmarkList([...bookmarkList, newitem]);
+			setBookmarkList([newitem, ...bookmarkList]);
 		}
 	};
 	const handleDownload = async () => {
@@ -46,24 +48,59 @@ export default function Home() {
 		link.download = "kanji.shirabe";
 		link.click();
 	};
-	const popup = (
-		<div className={styles.popup}>
-			<h1>Enter bookmark name</h1>
-			<input
-				type="text"
-				placeholder="Bookmark"
-				className={styles.popupInput}
-				value={filename}
-				onChange={(e) => setFilename(e.target.value)}
-			/>
-			<button className={styles.popupButton} onClick={handleDownload}>
-				Save
-			</button>
-		</div>
-	);
+	// const popup = (
+	// 	<div className={styles.popup}>
+	// 		<h1>Enter bookmark name</h1>
+	// 		<input
+	// 			type="text"
+	// 			placeholder="Bookmark"
+	// 			className={styles.popupInput}
+	// 			value={filename}
+	// 			onChange={(e) => setFilename(e.target.value)}
+	// 		/>
+	// 		<button className={styles.popupButton} onClick={handleDownload}>
+	// 			Save
+	// 		</button>
+	// 	</div>
+	// );
+	// eslint-disable-next-line
+	const handleKeyPresses = useCallback((e) => {
+		if (
+			e.key === "Backspace" &&
+			document.getElementById("input") !== document.activeElement
+		) {
+			setSelectedIndex(null);
+			document.getElementById("input").focus();
+		}
+		if (e.key === "ArrowDown") {
+			if (document.getElementById("input") === document.activeElement)
+				document.getElementById("input").blur();
+			if (selectedIndex === null) return setSelectedIndex(0);
+			if (selectedIndex === kanjiList.length - 1) return setSelectedIndex(0);
+			return setSelectedIndex(selectedIndex + 1);
+		}
+		if (e.key === "ArrowUp") {
+			if (document.getElementById("input") === document.activeElement)
+				document.getElementById("input").blur();
+			if (selectedIndex === null) return setSelectedIndex(kanjiList.length - 1);
+			if (selectedIndex === 0) return setSelectedIndex(kanjiList.length - 1);
+			return setSelectedIndex(selectedIndex - 1);
+		}
+		if (e.key === "Enter" && selectedIndex !== null) {
+			handleBookmarking(kanjiList[selectedIndex]);
+		}
+	});
+	useEffect(() => {
+		window.addEventListener("keydown", handleKeyPresses);
+		return () => {
+			window.removeEventListener("keydown", handleKeyPresses);
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	});
+
 	return (
 		<div className={styles.maincontainer}>
-			{popupActive && popup}
+			{/* {popupActive && popup} */}
 			<div className={styles.selectedlist}>
 				<div className={styles.bookmarkListBox}>
 					{bookmarkList.length === 0 && (
@@ -99,6 +136,7 @@ export default function Home() {
 						placeholder="Search"
 						value={searchQuery}
 						onChange={handleInputChange}
+						autoComplete="off"
 					/>
 					<input
 						type="submit"
@@ -111,14 +149,17 @@ export default function Home() {
 						<h1 className={styles.warning}>No Kanji Listed</h1>
 					)}
 					{kanjiList.map((item) => {
+						var classNameBuild = styles.kanjiText;
+						if (
+							bookmarkList.filter((bookmark) => bookmark.id === item.id)
+								.length > 0
+						)
+							classNameBuild = classNameBuild + " " + styles.isBookmarked;
+						if (selectedIndex === kanjiList.indexOf(item))
+							classNameBuild = classNameBuild + " " + styles.isSelected;
 						return (
 							<div
-								className={
-									bookmarkList.filter((bookmark) => bookmark.id === item.id)
-										.length > 0
-										? styles.isBookmarked + " " + styles.kanjiText
-										: styles.kanjiText
-								}
+								className={classNameBuild}
 								key={item.id}
 								onClick={() => {
 									handleBookmarking(item);
