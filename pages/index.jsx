@@ -48,6 +48,9 @@ export default function Home() {
 		link.download = "kanji.shirabe";
 		link.click();
 	};
+	const handleClearBookmark = () => {
+		setBookmarkList([]);
+	};
 	// const popup = (
 	// 	<div className={styles.popup}>
 	// 		<h1>Enter bookmark name</h1>
@@ -71,6 +74,7 @@ export default function Home() {
 		) {
 			setSelectedIndex(null);
 			document.getElementById("input").focus();
+			setSearchQuery("");
 		}
 		if (e.key === "ArrowDown") {
 			if (document.getElementById("input") === document.activeElement)
@@ -124,6 +128,8 @@ export default function Home() {
 				</div>
 				<div className={styles.downloadBox}>
 					<button onClick={handleDownload}>Download</button>
+					<button onClick={handleDownload}>Upload</button>
+					<button onClick={handleClearBookmark}>Clear</button>
 				</div>
 			</div>
 			<div className={styles.dictionarylist}>

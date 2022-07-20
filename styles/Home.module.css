@@ -102,12 +102,16 @@
 }
 .downloadBox {
 	width: 100%;
-	padding: 20px;
 	background-color: #242424;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .downloadBox button {
 	width: 100%;
+	margin: 20px;
 	height: 50px;
 	border: 0px none;
 	border-radius: 5px;
@@ -117,6 +121,7 @@
 	font-family: "San Francisco", sans-serif;
 	cursor: pointer;
 	align-self: flex-end;
+	width: 30%;
 }
 .bookmarkListBox {
 	width: 100%;
