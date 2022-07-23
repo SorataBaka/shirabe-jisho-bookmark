@@ -1,12 +1,11 @@
 import styles from "../styles/Home.module.css";
+import Popup from "../Components/popup";
 import { useState, useEffect, useCallback } from "react";
 
 export default function Home() {
 	const [kanjiList, setKanjiList] = useState([]);
 	const [bookmarkList, setBookmarkList] = useState([]);
 	const [searchQuery, setSearchQuery] = useState("");
-	const [popupActive, setPopupActive] = useState(false);
-	// const [filename, setFilename] = useState("");
 	const [selectedIndex, setSelectedIndex] = useState(null);
 
 	const handleInputChange = (e) => {
@@ -51,21 +50,7 @@ export default function Home() {
 	const handleClearBookmark = () => {
 		setBookmarkList([]);
 	};
-	// const popup = (
-	// 	<div className={styles.popup}>
-	// 		<h1>Enter bookmark name</h1>
-	// 		<input
-	// 			type="text"
-	// 			placeholder="Bookmark"
-	// 			className={styles.popupInput}
-	// 			value={filename}
-	// 			onChange={(e) => setFilename(e.target.value)}
-	// 		/>
-	// 		<button className={styles.popupButton} onClick={handleDownload}>
-	// 			Save
-	// 		</button>
-	// 	</div>
-	// );
+
 	// eslint-disable-next-line
 	const handleKeyPresses = useCallback((e) => {
 		if (
@@ -94,6 +79,28 @@ export default function Home() {
 			handleBookmarking(kanjiList[selectedIndex]);
 		}
 	});
+	const triggerFileUpload = () => {
+		const fileinput = document.createElement("input");
+		fileinput.type = "file";
+		fileinput.accept = "shirabe";
+		fileinput.onchange = async (e) => {
+			const file = e.target.files[0];
+			const reader = new FileReader();
+			reader.onload = async (e) => {
+				const jsonObject = JSON.parse(e.target.result);
+				const bookmarkArray = jsonObject.ShirabeJisho.Bookmarks.list;
+				console.log(bookmarkArray);
+				const resultObject = await fetch("/api/upload", {
+					method: "POST",
+					body: JSON.stringify(bookmarkArray),
+				});
+				const resultJson = await resultObject.json();
+				setBookmarkList(resultJson.data.words);
+			};
+			reader.readAsText(file);
+		};
+		fileinput.click();
+	};
 	useEffect(() => {
 		window.addEventListener("keydown", handleKeyPresses);
 		return () => {
@@ -104,7 +111,6 @@ export default function Home() {
 
 	return (
 		<div className={styles.maincontainer}>
-			{/* {popupActive && popup} */}
 			<div className={styles.selectedlist}>
 				<div className={styles.bookmarkListBox}>
 					{bookmarkList.length === 0 && (
@@ -128,7 +134,7 @@ export default function Home() {
 				</div>
 				<div className={styles.downloadBox}>
 					<button onClick={handleDownload}>Download</button>
-					<button onClick={handleDownload}>Upload</button>
+					<button onClick={triggerFileUpload}>Upload</button>
 					<button onClick={handleClearBookmark}>Clear</button>
 				</div>
 			</div>
