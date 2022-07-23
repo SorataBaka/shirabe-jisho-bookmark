@@ -16,10 +16,11 @@ export default function handler(req, res) {
 		});
 	const resultArray = Array.from(
 		body.map((id) => {
-			if (dictionaryMap.has(parseInt(id)))
+			const idInterger = parseInt(id);
+			if (dictionaryMap.has(idInterger))
 				return {
 					type: 0,
-					value: parseInt(id),
+					value: idInterger,
 				};
 		})
 	);

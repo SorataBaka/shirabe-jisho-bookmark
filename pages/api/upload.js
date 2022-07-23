@@ -16,8 +16,8 @@ export default function handler(req, res) {
 		});
 	var resultArray = [];
 	for (const jishoObject of body) {
-		if (dictionaryMap.has(jishoObject.value))
-			resultArray.push(dictionaryMap.get(jishoObject.value));
+		const result = dictionaryMap.get(jishoObject.value);
+		if (result) resultArray.push(result);
 	}
 	return res.json({
 		status: 200,
