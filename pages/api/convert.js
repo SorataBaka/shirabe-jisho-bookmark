@@ -2,6 +2,9 @@ const fs = require("fs");
 const path = require("path");
 const dictionary = fs.readFileSync(path.resolve("./pages/api/dictionary.json"));
 const dictionaryJson = JSON.parse(dictionary);
+const dictionaryMap = new Map(
+	dictionaryJson.map((word) => [parseInt(word.id), word])
+);
 export default function handler(req, res) {
 	if (req.method !== "POST")
 		return res.status(405).json({ status: 405, message: "Method not allowed" });
@@ -13,7 +16,7 @@ export default function handler(req, res) {
 		});
 	const resultArray = Array.from(
 		body.map((id) => {
-			if (dictionaryJson.filter((word) => word.id === id).length !== 0)
+			if (dictionaryMap.has(parseInt(id)))
 				return {
 					type: 0,
 					value: parseInt(id),

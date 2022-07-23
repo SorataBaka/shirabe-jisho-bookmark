@@ -1,5 +1,4 @@
 import styles from "../styles/Home.module.css";
-import Popup from "../Components/popup";
 import { useState, useEffect, useCallback } from "react";
 
 export default function Home() {
